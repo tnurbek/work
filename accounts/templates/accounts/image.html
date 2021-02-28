@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="row mt-3 mb-3">
+        <div class="col-md-4" id="real_image_div">
+            <img src="{{ image.image.url }}" width="100%" alt="" id="real_image">
+        </div>
+        <div class="col-md-8">
+            <span style="color: red;">Created time: </span><span>{{ image.created_at }}</span>
+            <br>
+            <hr>
+            <form action="http://127.0.0.1:8000/api/v1/images/{{ image.id }}/" data-method="put" id="update_form"
+                  class="form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <h4 class="text-center mb-3">Update form</h4>
+                <div class="custom-file">
+                    <input type="file" name="image" class="custom-file-input" id="image">
+                    <label class="custom-file-label" for="image">Upload image to change...</label>
+                </div>
+                <input type="hidden" name="id" id="image_id" value="{{ image.id }}">
+                <input type="hidden" name="user" value="{{ user.id }}">
+                <input type="hidden" id="image_url" value="{{ image.image.url }}">
+                <input type="submit" name="update" class="btn btn-dark mt-2 float-right" value="UPDATE IMAGE">
+            </form>
+            <br><br>
+            <hr>
+            <h5 class="border border-danger p-1">HISTORY OF CHANGES</h5>
+            <div id="logs_list">
+                {% for log in logs %}
+                    <a href="{{ host }}{{ log.file }}">{{ host }}{{ log.file }}</a><br>
+                {% endfor %}
+            </div>
+            <form action="{% url 'delete_image' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="image_id_delete" value="{{ image.id }}">
+                <input type="submit" class="btn btn-danger mt-3 float-right" value="DELETE IMAGE">
+            </form>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+        $(document).on('submit', '#update_form', function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+
+            var prev_url = $('#image_url').val();
+            var image_id = $('#image_id').val();
+
+            $.ajax({
+                url: $(this).attr('action'),
+                method: "PUT",
+                data: formData,
+                headers: {"X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')},
+                success: function (data) {
+
+                    $('#real_image').attr('src', data['image']);
+
+                    $.ajax({
+                        url: "http://127.0.0.1:8000/api/v1/logs/",
+                        method: "POST",
+                        data: {file: prev_url, image: image_id},
+                        headers: {"X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')},
+                        success: function (data) {
+                            console.log(data);
+                            var content_prepended = '<a href="http://127.0.0.1:8000'+data['file']+'">http://127.0.0.1:8000'+data['file']+'</a><br>'
+                            var log_div = document.getElementById('logs_list');
+                            log_div.innerHTML += content_prepended;
+                        }
+                    });
+                },
+                error: function (data) {
+                    console.log(data);
+                    alert(JSON.parse(data['responseText'])['image']);
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+    </script>
+{% endblock %}

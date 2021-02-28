@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <form action="" method="post" class="form" enctype="multipart/form-data" id="form">
+                    {% csrf_token %}
+                    <input type="hidden" name="user" id="user" value="{{ user.id }}">
+                    <h2 class="text-center">Upload an image</h2>
+                    <div class="custom-file">
+                        <input type="file" name="image" class="custom-file-input" id="image">
+                        <label class="custom-file-label" for="image">Upload an image file...</label>
+                    </div>
+                    <input type="submit" class="btn btn-dark mt-2 float-right" name="upload" id="upload"
+                           value="UPLOAD AN IMAGE">
+                </form>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-12">
+                <h5 class="text-center mb-3">There will appear all uploaded images by you:</h5>
+                <table class="table table-sm table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th width="25%">image</th>
+                        <th width="55%">image url</th>
+                        <th>created at</th>
+                    </tr>
+                    </thead>
+                    <tbody id="image_content">
+                    {% for image in images %}
+                        <tr> {# data-toggle="modal" data-target="#exampleModal" #}
+                            <td>{{ forloop.counter }}</td>
+                            <td><div class="image" style='background:url({{ image.image.url }}); background-size: 150px;'></div></td>
+{#                            <img src="{{ image.image.url }}" alt="" style="max-width:100px; height: auto;">#}
+                            <td>
+                                <span>To see image, click on: </span>
+                                <a href="{{ image.image.url }}">{{ image.image.url }}</a><br><br>
+                                <span>To edit image:</span>
+                                <a href="{% url 'image' image.id %}" class="btn-sm btn-info">SEE IMAGE</a>
+                            </td>
+                            <td>{{ image.created_at | date:"Y-m-d" }} {{ image.created_at | time:"H:i:s" }}</td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+    <script>
+        $(".custom-file-input").on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        });
+        $(document).on('submit', '#form', function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            $.ajax({
+                url: "http://127.0.0.1:8000/api/v1/images/",
+                method: "POST",
+                data: formData,
+                success: function (data) {
+                    console.log(data);
+                    var login = data['user'];
+                    var created_at = data['created_at'];
+                    var location = data['image'];
+                    $.ajax({
+                        url: "{% url 'fetch' %}",
+                        method: "GET",
+                        data: {},
+                        success: function (data) {
+                            $('#image_content').html(data);
+                        }
+                    });
+                    $.ajax({
+                        url: "{% url 'send_email' %}",
+                        method: "POST",
+                        data: {login:login, created_at:created_at, location:location},
+                        headers: {"X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')},
+                        success: function (data){
+                            console.log(data);
+                        }
+                    });
+                },
+                error: function (data) {
+                    alert(JSON.parse(data['responseText'])['image']);
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+    </script>
+{% endblock %}

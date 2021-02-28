@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>WORKTASK</title>
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/pricing/">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        {#img {#}
+        {#    float: left;#}
+        {#    width: 100px;#}
+        {#    height: 100px;#}
+        {#    object-fit: cover;#}
+        {# }#}
+
+        .image {
+            height: 150px;
+            width: 150px;
+            {#overflow: hidden;#}
+        }
+
+        .image img {
+            position: absolute;
+            {#object-fit: cover;#}
+        }
+    </style>
+</head>
+<body data-new-gr-c-s-check-loaded="14.997.0">
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">HOME</a>
+            <div>
+
+                {% if user.is_authenticated %}
+                    <div class="float-right">
+                        <a class="navbar-brand" href="{% url 'signout' %}">SIGN OUT</a>
+                    </div>
+                    <div class="float-right">
+                        <a class="navbar-brand" href="/admin">{{ user.username | upper }}</a>
+                    </div>
+                {% else %}
+                    <div class="float-right">
+                        <a class="navbar-brand" href="{% url 'signin' %}">SIGN IN</a>
+                    </div>
+                    <div class="float-right">
+                        <a class="navbar-brand" href="{% url 'signup' %}">SIGN UP</a>
+                    </div>
+                {% endif %}
+                <div class="float-right">
+                    <a class="navbar-brand" href="/api/v1/images">API</a>
+                </div>
+            </div>
+        </div>
+
+    </nav>
+</div>
+<div class="container">
+    {% block content %}
+
+    {% endblock %}
+</div>
+{% block script %}
+
+{% endblock %}
+</body>
+</html>

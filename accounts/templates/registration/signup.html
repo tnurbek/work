@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-8 offset-2">
+            <form action="{% url 'signup' %}" class="create-account-form" method="post">
+                {% csrf_token %}
+                <h2 class="text-center m-2">
+                    CREATE AN ACCOUNT
+                </h2>
+                {% for field in form %}
+                    <div class="form-group" style="margin-top: 25px;">
+                        <label for="id_{{ field.name }}" style="font-size: 18px;">{{ field.label_tag }}</label>
+                        <input type="{% if 'password' in field.name %}password{% else %}text{% endif %}" required
+                               class="form-control" name="{{ field.name }}"
+                               id="id_{{ field.name }}" style="height: 40px;">
+                    </div>
+                {% endfor %}
+                <input class="btn btn-dark" type="submit" value="Create an account">
+            </form>
+        </div>
+    </div>
+{% endblock %}
