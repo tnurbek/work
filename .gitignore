@@ -257,3 +257,4 @@ $RECYCLE.BIN/
 
 .idea/
 .env
+__pycache__/
