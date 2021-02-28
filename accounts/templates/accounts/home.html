@@ -82,7 +82,7 @@
             e.preventDefault();
             var formData = new FormData(this);
             $.ajax({
-                url: "http://127.0.0.1:8000/api/v1/images/",
+                url: "https://tnurbek.herokuapp.com/api/v1/images/",
                 method: "POST",
                 data: formData,
                 success: function (data) {

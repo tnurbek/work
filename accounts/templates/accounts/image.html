@@ -9,7 +9,7 @@
             <span style="color: red;">Created time: </span><span>{{ image.created_at }}</span>
             <br>
             <hr>
-            <form action="http://127.0.0.1:8000/api/v1/images/{{ image.id }}/" data-method="put" id="update_form"
+            <form action="https://tnurbek.herokuapp.com/api/v1/images/{{ image.id }}/" data-method="put" id="update_form"
                   class="form" enctype="multipart/form-data">
                 {% csrf_token %}
                 <h4 class="text-center mb-3">Update form</h4>
@@ -61,13 +61,13 @@
                     $('#real_image').attr('src', data['image']);
 
                     $.ajax({
-                        url: "http://127.0.0.1:8000/api/v1/logs/",
+                        url: "https://tnurbek.herokuapp.com/api/v1/logs/",
                         method: "POST",
                         data: {file: prev_url, image: image_id},
                         headers: {"X-CSRFToken": $('[name="csrfmiddlewaretoken"]').attr('value')},
                         success: function (data) {
                             console.log(data);
-                            var content_prepended = '<a href="http://127.0.0.1:8000'+data['file']+'">http://127.0.0.1:8000'+data['file']+'</a><br>'
+                            var content_prepended = '<a href="https://tnurbek.herokuapp.com'+data['file']+'">https://tnurbek.herokuapp.com'+data['file']+'</a><br>'
                             var log_div = document.getElementById('logs_list');
                             log_div.innerHTML += content_prepended;
                         }
