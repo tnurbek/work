@@ -1,1 +1,1 @@
-# work task 1
+# Toy Project (Django)
